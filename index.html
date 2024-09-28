@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Admin Panel (Imitation)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .admin-panel {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .admin-button {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .admin-button:hover {
+            background-color: #0056b3;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .log {
+            margin-top: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Roblox Admin Panel</h1>
+
+<div class="admin-panel">
+    <div class="input-group">
+        <label for="username">Target Username:</label>
+        <input type="text" id="username" placeholder="Enter username">
+    </div>
+
+    <div class="input-group">
+        <label for="robuxAmount">Robux Amount:</label>
+        <input type="number" id="robuxAmount" placeholder="Enter Robux amount">
+    </div>
+
+    <button class="admin-button" onclick="giveRobux()">Give Robux</button>
+    <button class="admin-button" onclick="banUser()">Ban User</button>
+    <button class="admin-button" onclick="pBanUser()">Permanent Ban</button>
+    <button class="admin-button" onclick="ipBanUser()">IP Ban</button>
+    <button class="admin-button" onclick="warnUser()">Warn User</button>
+    <button class="admin-button" onclick="deleteContent()">Delete Content</button>
+
+    <div class="log" id="logOutput"></div>
+</div>
+
+<script>
+    function logAction(action) {
+        const logOutput = document.getElementById("logOutput");
+        logOutput.textContent += action + "\\n";
+    }
+
+    function giveRobux() {
+        const username = document.getElementById("username").value;
+        const robuxAmount = document.getElementById("robuxAmount").value;
+
+        if (username && robuxAmount > 0) {
+            logAction(`Gave ${robuxAmount} Robux to ${username}.`);
+        } else {
+            logAction("Error: Username or Robux amount is invalid.");
+        }
+    }
+
+    function banUser() {
+        const username = document.getElementById("username").value;
+
+        if (username) {
+            logAction(`User ${username} has been banned.`);
+        } else {
+            logAction("Error: Username is invalid.");
+        }
+    }
+
+    function pBanUser() {
+        const username = document.getElementById("username").value;
+
+        if (username) {
+            logAction(`User ${username} has been permanently banned.`);
+        } else {
+            logAction("Error: Username is invalid.");
+        }
+    }
+
+    function ipBanUser() {
+        const username = document.getElementById("username").value;
+
+        if (username) {
+            logAction(`User ${username} has been IP banned.`);
+        } else {
+            logAction("Error: Username is invalid.");
+        }
+    }
+
+    function warnUser() {
+        const username = document.getElementById("username").value;
+
+        if (username) {
+            logAction(`User ${username} has been warned.`);
+        } else {
+            logAction("Error: Username is invalid.");
+        }
+    }
+
+    function deleteContent() {
+        const username = document.getElementById("username").value;
+
+        if (username) {
+            logAction(`Content for user ${username} has been deleted.`);
+        } else {
+            logAction("Error: Username is invalid.");
+        }
+    }
+</script>
+
+</body>
+</html>
