@@ -13,7 +13,7 @@
             padding: 0;
             transition: all 0.3s ease;
         }
-
+        
         h1 {
             text-align: center;
             color: #333;
@@ -39,34 +39,92 @@
             background-color: var(--button-bg-color, #007bff);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: var(--button-font-size, 16px);
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
         }
 
         .admin-button:hover {
             background-color: #0056b3;
         }
 
-        .notification {
-            display: none;
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            background-color: #e7f3fe;
-            color: #31708f;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .log {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+
+        .input-color {
+            width: 80px;
+            height: 30px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Notifications */
+        .notification {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 999;
         }
 
         .notification.error {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #dc3545;
         }
 
+        /* Customization */
+        .customization-panel {
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
@@ -83,7 +141,8 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
-            border-radius: 10px;
+            max-width: 500px;
+            border-radius: 8px;
         }
 
         .close {
@@ -100,84 +159,141 @@
             cursor: pointer;
         }
 
-        /* Customization Area */
-        .customization {
-            margin: 20px 0;
-        }
-
-        .settings-group {
-            margin-bottom: 15px;
-        }
-
-        #logOutput {
-            background-color: #eee;
+        /* User Details */
+        .user-details {
             padding: 10px;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: scroll;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Help Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the tooltip */
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
+<h1>Roblox Admin Panel (Enhanced)</h1>
+
+<!-- Admin Panel -->
 <div class="admin-panel">
-    <h1>Roblox Admin Panel</h1>
+    <div class="section">
+        <h2>Manage Users</h2>
+        <div class="input-group">
+            <label for="username">Target Username(s):</label>
+            <input type="text" id="username" placeholder="Enter username(s), comma-separated for bulk actions">
+        </div>
+
+        <div class="input-group">
+            <label for="robuxAmount">Robux Amount:</label>
+            <input type="number" id="robuxAmount" placeholder="Enter Robux amount">
+        </div>
+
+        <div class="input-group">
+            <label for="banDuration">Ban Duration:</label>
+            <select id="banDuration">
+                <option value="1 day">1 day</option>
+                <option value="3 days">3 days</option>
+                <option value="1 week">1 week</option>
+                <option value="1 month">1 month</option>
+                <option value="3 months">3 months</option>
+                <option value="1 year">1 year</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="reason">Reason for Ban/Warning:</label>
+            <textarea id="reason" rows="3" placeholder="Enter the reason"></textarea>
+        </div>
+
+        <button class="admin-button tooltip" onclick="confirmGiveRobux()">
+            Give Robux
+            <span class="tooltiptext">Give Robux to the user</span>
+        </button>
+        <button class="admin-button tooltip" onclick="confirmTempBanUser()">
+            Temporary Ban
+            <span class="tooltiptext">Ban user for a specific duration</span>
+        </button>
+        <button class="admin-button tooltip" onclick="confirmPermaBanUser()">
+            Permanent Ban
+            <span class="tooltiptext">Permanently ban the user</span>
+        </button>
+        <button class="admin-button tooltip" onclick="confirmIpBanUser()">
+            IP Ban
+            <span class="tooltiptext">Ban the user's IP address</span>
+        </button>
+        <button class="admin-button tooltip" onclick="confirmWarnUser()">
+            Warn User
+            <span class="tooltiptext">Issue a warning to the user</span>
+        </button>
+
+        <h3>User Details</h3>
+        <div id="userDetails" class="user-details"></div>
+    </div>
 
     <div class="section">
-        <h2>User Management</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="text" id="robuxAmount" placeholder="Robux Amount">
-        <select id="banDuration">
-            <option value="1 day">1 Day</option>
-            <option value="3 days">3 Days</option>
-            <option value="1 week">1 Week</option>
-            <option value="1 month">1 Month</option>
-            <option value="3 months">3 Months</option>
-            <option value="1 year">1 Year</option>
-        </select>
-        <input type="text" id="reason" placeholder="Reason">
-        <button class="admin-button" onclick="confirmGiveRobux()">Give Robux</button>
-        <button class="admin-button" onclick="confirmTempBanUser()">Temp Ban</button>
-        <button class="admin-button" onclick="confirmPermaBanUser()">Perma Ban</button>
-        <button class="admin-button" onclick="confirmIpBanUser()">IP Ban</button>
-        <button class="admin-button" onclick="confirmWarnUser()">Warn</button>
+        <h2>Log</h2>
+        <div class="log" id="logOutput"></div>
+    </div>
+</div>
+
+<!-- Customization Panel -->
+<div class="customization-panel">
+    <h2>Customize Admin Panel</h2>
+    <div class="settings-group">
+        <label for="panelColor">Panel Background Color:</label>
+        <input type="color" id="panelColor" class="input-color">
     </div>
 
-    <div class="section">
-        <h2>Log Output</h2>
-        <pre id="logOutput"></pre>
+    <div class="settings-group">
+        <label for="buttonColor">Button Background Color:</label>
+        <input type="color" id="buttonColor" class="input-color">
     </div>
 
-    <div class="customization">
-        <h2>Customize Panel</h2>
-        <div class="settings-group">
-            <label for="panelColor">Panel Background Color:</label>
-            <input type="color" id="panelColor" class="input-color">
-        </div>
-        <div class="settings-group">
-            <label for="buttonColor">Button Background Color:</label>
-            <input type="color" id="buttonColor" class="input-color">
-        </div>
-        <div class="settings-group">
-            <label for="fontSize">Button Font Size:</label>
-            <input type="number" id="fontSize" placeholder="Font size (px)">
-        </div>
-
-        <button class="admin-button" onclick="applyCustomizations()">Apply Customizations</button>
-        <button class="admin-button" onclick="resetCustomizations()">Reset Customizations</button>
+    <div class="settings-group">
+        <label for="fontSize">Button Font Size:</label>
+        <input type="number" id="fontSize" placeholder="Font size (px)">
     </div>
 
-    <!-- Notification Area -->
-    <div id="notification" class="notification"></div>
+    <button class="admin-button" onclick="applyCustomizations()">Apply Customizations</button>
+    <button class="admin-button" onclick="resetCustomizations()">Reset Customizations</button>
+</div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <p id="modalMessage"></p>
-            <button class="admin-button" id="confirmButton">Confirm</button>
-            <button class="admin-button" onclick="closeModal()">Cancel</button>
-        </div>
+<!-- Notification Area -->
+<div id="notification" class="notification"></div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p id="modalMessage"></p>
+        <button class="admin-button" id="confirmButton">Confirm</button>
+        <button class="admin-button" onclick="closeModal()">Cancel</button>
     </div>
 </div>
 
@@ -257,121 +373,141 @@
         const robuxAmount = document.getElementById("robuxAmount").value;
         logAction(`Gave ${robuxAmount} Robux to user ${username}.`);
         showNotification(`Successfully gave ${robuxAmount} Robux to ${username}.`);
+        resetInputs();
     }
 
     function tempBanUser() {
         const username = document.getElementById("username").value;
         const banDuration = document.getElementById("banDuration").value;
-        logAction(`Temporarily banned user ${username} for ${banDuration}.`);
-        showNotification(`Successfully temporarily banned user ${username} for ${banDuration}.`);
+        const reason = document.getElementById("reason").value;
+        logAction(`User ${username} has been temporarily banned for ${banDuration}. Reason: ${reason}.`);
+        showNotification(`User ${username} has been temporarily banned for ${banDuration}.`);
+        resetInputs();
     }
 
     function permaBanUser() {
         const username = document.getElementById("username").value;
-        logAction(`Permanently banned user ${username}.`);
-        showNotification(`Successfully permanently banned user ${username}.`);
+        const reason = document.getElementById("reason").value;
+        logAction(`User ${username} has been permanently banned. Reason: ${reason}.`);
+        showNotification(`User ${username} has been permanently banned.`);
+        resetInputs();
     }
 
     function ipBanUser() {
         const username = document.getElementById("username").value;
-        logAction(`IP banned user ${username}.`);
-        showNotification(`Successfully IP banned user ${username}.`);
+        logAction(`IP ban applied to user ${username}.`);
+        showNotification(`IP ban applied to user ${username}.`);
+        resetInputs();
     }
 
     function warnUser() {
         const username = document.getElementById("username").value;
         const reason = document.getElementById("reason").value;
-        logAction(`Warned user ${username}: ${reason}`);
-        showNotification(`Successfully warned user ${username}.`);
-    }
-
-    function showNotification(message, isError = false) {
-        const notification = document.getElementById("notification");
-        notification.textContent = message;
-        notification.className = `notification ${isError ? 'error' : ''}`;
-        notification.style.display = "block";
-        setTimeout(() => {
-            notification.style.display = "none";
-        }, 5000);
+        logAction(`User ${username} has been warned. Reason: ${reason}.`);
+        showNotification(`User ${username} has been warned.`);
+        resetInputs();
     }
 
     function logAction(action) {
         const logOutput = document.getElementById("logOutput");
-        const logEntry = `${new Date().toLocaleString()}: ${action}`;
-        logOutput.textContent += logEntry + "\n";
-        saveLog(logEntry);
-    }
-
-    function saveLog(logEntry) {
-        const logs = JSON.parse(localStorage.getItem("adminLogs")) || [];
-        logs.push(logEntry);
-        localStorage.setItem("adminLogs", JSON.stringify(logs));
+        const timestamp = new Date().toLocaleString();
+        logOutput.textContent += `[${timestamp}] ${action}\n`;
+        saveLog(logOutput.textContent);
     }
 
     function loadLog() {
-        const logs = JSON.parse(localStorage.getItem("adminLogs")) || [];
-        document.getElementById("logOutput").textContent = logs.join("\n");
+        const savedLog = localStorage.getItem("adminLog");
+        if (savedLog) {
+            document.getElementById("logOutput").textContent = savedLog;
+        }
     }
 
+    function saveLog(logContent) {
+        localStorage.setItem("adminLog", logContent);
+    }
+
+    function resetInputs() {
+        document.getElementById("username").value = '';
+        document.getElementById("robuxAmount").value = '';
+        document.getElementById("reason").value = '';
+        document.getElementById("banDuration").value = '1 day';
+        document.getElementById("userDetails").textContent = '';
+    }
+
+    // Notification System
+    function showNotification(message, isError = false) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.classList.toggle("error", isError);
+        notification.style.display = "block";
+
+        setTimeout(() => {
+            notification.style.display = "none";
+        }, 3000);
+    }
+
+    // Customization Features
     function applyCustomizations() {
         const panelColor = document.getElementById("panelColor").value;
         const buttonColor = document.getElementById("buttonColor").value;
         const fontSize = document.getElementById("fontSize").value;
 
         if (panelColor) {
-            document.querySelector('.admin-panel').style.backgroundColor = panelColor;
-            saveCustomization("panelColor", panelColor);
+            document.body.style.setProperty('--panel-bg-color', panelColor);
         }
-
         if (buttonColor) {
-            document.querySelectorAll('.admin-button').forEach(button => {
-                button.style.backgroundColor = buttonColor;
-            });
-            saveCustomization("buttonColor", buttonColor);
+            document.body.style.setProperty('--button-bg-color', buttonColor);
         }
-
         if (fontSize) {
-            document.querySelectorAll('.admin-button').forEach(button => {
-                button.style.fontSize = fontSize + "px";
-            });
-            saveCustomization("buttonFontSize", fontSize);
+            document.body.style.setProperty('--button-font-size', fontSize + 'px');
         }
 
-        showNotification("Customizations applied successfully.");
+        saveCustomizations();
+        showNotification("Customizations applied successfully!");
     }
 
     function resetCustomizations() {
-        localStorage.removeItem("customizations");
-        loadCustomizations();
+        document.body.style.setProperty('--panel-bg-color', '#ffffff');
+        document.body.style.setProperty('--button-bg-color', '#007bff');
+        document.body.style.setProperty('--button-font-size', '16px');
+
+        resetCustomizationInputs();
         showNotification("Customizations reset to default.");
     }
 
-    function saveCustomization(key, value) {
-        const customizations = JSON.parse(localStorage.getItem("customizations")) || {};
-        customizations[key] = value;
-        localStorage.setItem("customizations", JSON.stringify(customizations));
+    function saveCustomizations() {
+        const panelColor = document.getElementById("panelColor").value;
+        const buttonColor = document.getElementById("buttonColor").value;
+        const fontSize = document.getElementById("fontSize").value;
+
+        localStorage.setItem("panelColor", panelColor);
+        localStorage.setItem("buttonColor", buttonColor);
+        localStorage.setItem("fontSize", fontSize);
     }
 
     function loadCustomizations() {
-        const customizations = JSON.parse(localStorage.getItem("customizations")) || {};
-        
-        // Apply custom settings if they exist
-        if (customizations.panelColor) {
-            document.querySelector('.admin-panel').style.backgroundColor = customizations.panelColor;
-            document.getElementById("panelColor").value = customizations.panelColor;
+        const panelColor = localStorage.getItem("panelColor");
+        const buttonColor = localStorage.getItem("buttonColor");
+        const fontSize = localStorage.getItem("fontSize");
+
+        if (panelColor) {
+            document.body.style.setProperty('--panel-bg-color', panelColor);
+            document.getElementById("panelColor").value = panelColor;
         }
-        if (customizations.buttonColor) {
-            document.querySelectorAll('.admin-button').forEach(button => {
-                button.style.backgroundColor = customizations.buttonColor;
-            });
-            document.getElementById("buttonColor").value = customizations.buttonColor;
+        if (buttonColor) {
+            document.body.style.setProperty('--button-bg-color', buttonColor);
+            document.getElementById("buttonColor").value = buttonColor;
         }
-        if (customizations.buttonFontSize) {
-            document.querySelectorAll('.admin-button').forEach(button => {
-                button.style.fontSize = customizations.buttonFontSize + "px";
-            });
-            document.getElementById("fontSize").value = customizations.buttonFontSize;
+        if (fontSize) {
+            document.body.style.setProperty('--button-font-size', fontSize + 'px');
+            document.getElementById("fontSize").value = fontSize;
         }
+    }
+
+    function resetCustomizationInputs() {
+        document.getElementById("panelColor").value = '#ffffff';
+        document.getElementById("buttonColor").value = '#007bff';
+        document.getElementById("fontSize").value = '';
     }
 </script>
 
