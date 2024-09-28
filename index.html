@@ -17,13 +17,14 @@
             color: #333;
         }
 
-        .admin-panel {
+        .admin-panel, .password-panel {
             max-width: 800px;
             margin: 20px auto;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            display: none; /* Hidden initially */
         }
 
         .admin-button {
@@ -53,7 +54,17 @@
             display: block;
         }
 
-        input[type="number"] {
+        input[type="number"], input[type="password"], input[type="text"], textarea {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        select {
             padding: 10px;
             font-size: 16px;
             width: 100%;
@@ -74,11 +85,25 @@
             height: 200px;
             overflow-y: auto;
         }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <h1>Roblox Admin Panel</h1>
+
+<div class="password-panel">
+    <div class="input-group">
+        <label for="adminPassword">Enter Admin Password:</label>
+        <input type="password" id="adminPassword" placeholder="Enter password">
+    </div>
+    <button class="admin-button" onclick="verifyPassword()">Submit</button>
+    <p id="passwordError" class="error" style="display: none;">Incorrect password, please try again.</p>
+</div>
 
 <div class="admin-panel">
     <div class="input-group">
@@ -91,8 +116,25 @@
         <input type="number" id="robuxAmount" placeholder="Enter Robux amount">
     </div>
 
+    <div class="input-group">
+        <label for="banDuration">Ban Duration:</label>
+        <select id="banDuration">
+            <option value="1 day">1 day</option>
+            <option value="3 days">3 days</option>
+            <option value="1 week">1 week</option>
+            <option value="1 month">1 month</option>
+            <option value="3 months">3 months</option>
+            <option value="1 year">1 year</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="reason">Reason (for PBan, TBan, or Warning):</label>
+        <textarea id="reason" rows="3" placeholder="Enter reason for action"></textarea>
+    </div>
+
     <button class="admin-button" onclick="giveRobux()">Give Robux</button>
-    <button class="admin-button" onclick="banUser()">Ban User</button>
+    <button class="admin-button" onclick="banUser()">Temporary Ban</button>
     <button class="admin-button" onclick="pBanUser()">Permanent Ban</button>
     <button class="admin-button" onclick="ipBanUser()">IP Ban</button>
     <button class="admin-button" onclick="warnUser()">Warn User</button>
@@ -102,9 +144,24 @@
 </div>
 
 <script>
+    const correctPassword = "TRillioN.001";
+
+    function verifyPassword() {
+        const passwordInput = document.getElementById("adminPassword").value;
+        const passwordError = document.getElementById("passwordError");
+
+        if (passwordInput === correctPassword) {
+            document.querySelector('.password-panel').style.display = 'none';
+            document.querySelector('.admin-panel').style.display = 'block';
+        } else {
+            passwordError.style.display = 'block';
+        }
+    }
+
     function logAction(action) {
         const logOutput = document.getElementById("logOutput");
-        logOutput.textContent += action + "\\n";
+        logOutput.textContent += action + "\n";
+        logOutput.scrollTop = logOutput.scrollHeight;  // Scrolls to the bottom for new logs
     }
 
     function giveRobux() {
@@ -120,21 +177,24 @@
 
     function banUser() {
         const username = document.getElementById("username").value;
+        const banDuration = document.getElementById("banDuration").value;
+        const reason = document.getElementById("reason").value;
 
-        if (username) {
-            logAction(`User ${username} has been banned.`);
+        if (username && reason) {
+            logAction(`User ${username} has been temporarily banned for ${banDuration}. Reason: ${reason}.`);
         } else {
-            logAction("Error: Username is invalid.");
+            logAction("Error: Username or reason is missing.");
         }
     }
 
     function pBanUser() {
         const username = document.getElementById("username").value;
+        const reason = document.getElementById("reason").value;
 
-        if (username) {
-            logAction(`User ${username} has been permanently banned.`);
+        if (username && reason) {
+            logAction(`User ${username} has been permanently banned. Reason: ${reason}.`);
         } else {
-            logAction("Error: Username is invalid.");
+            logAction("Error: Username or reason is missing.");
         }
     }
 
@@ -150,11 +210,12 @@
 
     function warnUser() {
         const username = document.getElementById("username").value;
+        const reason = document.getElementById("reason").value;
 
-        if (username) {
-            logAction(`User ${username} has been warned.`);
+        if (username && reason) {
+            logAction(`User ${username} has been warned. Reason: ${reason}.`);
         } else {
-            logAction("Error: Username is invalid.");
+            logAction("Error: Username or reason is missing.");
         }
     }
 
