@@ -17,14 +17,13 @@
             color: #333;
         }
 
-        .admin-panel, .password-panel {
+        .admin-panel {
             max-width: 800px;
             margin: 20px auto;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            display: none; /* Hidden initially */
         }
 
         .admin-button {
@@ -54,7 +53,7 @@
             display: block;
         }
 
-        input[type="number"], input[type="password"], input[type="text"], textarea {
+        input[type="number"], input[type="text"], textarea {
             padding: 10px;
             font-size: 16px;
             width: 100%;
@@ -96,15 +95,6 @@
 
 <h1>Roblox Admin Panel</h1>
 
-<div class="password-panel">
-    <div class="input-group">
-        <label for="adminPassword">Enter Admin Password:</label>
-        <input type="password" id="adminPassword" placeholder="Enter password">
-    </div>
-    <button class="admin-button" onclick="verifyPassword()">Submit</button>
-    <p id="passwordError" class="error" style="display: none;">Incorrect password, please try again.</p>
-</div>
-
 <div class="admin-panel">
     <div class="input-group">
         <label for="username">Target Username:</label>
@@ -144,20 +134,6 @@
 </div>
 
 <script>
-    const correctPassword = "TRillioN.001";
-
-    function verifyPassword() {
-        const passwordInput = document.getElementById("adminPassword").value;
-        const passwordError = document.getElementById("passwordError");
-
-        if (passwordInput === correctPassword) {
-            document.querySelector('.password-panel').style.display = 'none';
-            document.querySelector('.admin-panel').style.display = 'block';
-        } else {
-            passwordError.style.display = 'block';
-        }
-    }
-
     function logAction(action) {
         const logOutput = document.getElementById("logOutput");
         logOutput.textContent += action + "\n";
