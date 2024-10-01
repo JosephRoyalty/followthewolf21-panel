@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Admin Panel (Enhanced)</title>
     <style>
-
         /* Base Styles */
         body {
             font-family: Arial, sans-serif;
@@ -160,6 +159,7 @@
             cursor: pointer;
         }
 
+
         /* Help Tooltips */
         .tooltip {
             position: relative;
@@ -245,6 +245,8 @@
             <span class="tooltiptext">Issue a warning to the user</span>
         </button>
 
+    </div>
+
     <div class="section">
         <h2>Log</h2>
         <div class="log" id="logOutput"></div>
@@ -298,7 +300,7 @@
         const robuxAmount = document.getElementById("robuxAmount").value;
 
         if (username && robuxAmount) {
-            showConfirmation(Give ${robuxAmount} Robux to ${username}?, () => giveRobux());
+            showConfirmation(`Give ${robuxAmount} Robux to ${username}?`, () => giveRobux());
         } else {
             showNotification("Error: Missing username or Robux amount.", true);
         }
@@ -310,7 +312,7 @@
         const reason = document.getElementById("reason").value;
 
         if (username && reason) {
-            showConfirmation(Temporarily ban ${username} for ${banDuration}?, () => tempBanUser());
+            showConfirmation(`Temporarily ban ${username} for ${banDuration}?`, () => tempBanUser());
         } else {
             showNotification("Error: Missing username or reason.", true);
         }
@@ -321,7 +323,7 @@
         const reason = document.getElementById("reason").value;
 
         if (username && reason) {
-            showConfirmation(Permanently ban ${username}?, () => permaBanUser());
+            showConfirmation(`Permanently ban ${username}?`, () => permaBanUser());
         } else {
             showNotification("Error: Missing username or reason.", true);
         }
@@ -330,7 +332,7 @@
     function confirmIpBanUser() {
         const username = document.getElementById("username").value;
         if (username) {
-            showConfirmation(Apply IP ban to ${username}?, () => ipBanUser());
+            showConfirmation(`Apply IP ban to ${username}?`, () => ipBanUser());
         } else {
             showNotification("Error: Username is missing.", true);
         }
@@ -341,7 +343,7 @@
         const reason = document.getElementById("reason").value;
 
         if (username && reason) {
-            showConfirmation(Warn ${username}?, () => warnUser());
+            showConfirmation(`Warn ${username}?`, () => warnUser());
         } else {
             showNotification("Error: Missing username or reason.", true);
         }
@@ -360,8 +362,8 @@
     function giveRobux() {
         const username = document.getElementById("username").value;
         const robuxAmount = document.getElementById("robuxAmount").value;
-        logAction(Gave ${robuxAmount} Robux to user ${username}.);
-        showNotification(Successfully gave ${robuxAmount} Robux to ${username}.);
+        logAction(`Gave ${robuxAmount} Robux to user ${username}.`);
+        showNotification(`Successfully gave ${robuxAmount} Robux to ${username}.`);
         resetInputs();
     }
 
@@ -369,38 +371,38 @@
         const username = document.getElementById("username").value;
         const banDuration = document.getElementById("banDuration").value;
         const reason = document.getElementById("reason").value;
-        logAction(User ${username} has been temporarily banned for ${banDuration}. Reason: ${reason}.);
-        showNotification(User ${username} has been temporarily banned for ${banDuration}.);
+        logAction(`User ${username} has been temporarily banned for ${banDuration}. Reason: ${reason}.`);
+        showNotification(`User ${username} has been temporarily banned for ${banDuration}.`);
         resetInputs();
     }
 
     function permaBanUser() {
         const username = document.getElementById("username").value;
         const reason = document.getElementById("reason").value;
-        logAction(User ${username} has been permanently banned. Reason: ${reason}.);
-        showNotification(User ${username} has been permanently banned.);
+        logAction(`User ${username} has been permanently banned. Reason: ${reason}.`);
+        showNotification(`User ${username} has been permanently banned.`);
         resetInputs();
     }
 
     function ipBanUser() {
         const username = document.getElementById("username").value;
-        logAction(IP ban applied to user ${username}.);
-        showNotification(IP ban applied to user ${username}.);
+        logAction(`IP ban applied to user ${username}.`);
+        showNotification(`IP ban applied to user ${username}.`);
         resetInputs();
     }
 
     function warnUser() {
         const username = document.getElementById("username").value;
         const reason = document.getElementById("reason").value;
-        logAction(User ${username} has been warned. Reason: ${reason}.);
-        showNotification(User ${username} has been warned.);
+        logAction(`User ${username} has been warned. Reason: ${reason}.`);
+        showNotification(`User ${username} has been warned.`);
         resetInputs();
     }
 
     function logAction(action) {
         const logOutput = document.getElementById("logOutput");
         const timestamp = new Date().toLocaleString();
-        logOutput.textContent += [${timestamp}] ${action}\n;
+        logOutput.textContent += `[${timestamp}] ${action}\n`;
         saveLog(logOutput.textContent);
     }
 
