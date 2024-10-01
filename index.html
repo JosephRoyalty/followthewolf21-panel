@@ -200,61 +200,194 @@
 
     function reportAction() {
         const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
-        if (usernames.length) {
-            showConfirmation(`Report the following usernames: ${usernames.join(", ")}?`, () => logAction(`Reported users: ${usernames.join(", ")}`));
-        } else {
+        const reason = document.getElementById("reason").value;
+        
+        if (!usernames.length || usernames[0] === "") {
             showNotification("Error: Missing usernames for report.", true);
+        } else if (!reason) {
+            showNotification("Error: Missing reason for report.", true);
+        } else {
+            showConfirmation(`Report the following usernames: ${usernames.join(", ")} with reason: ${reason}?`, () => logAction(`Reported users: ${usernames.join(", ")} | Reason: ${reason}`));
         }
     }
 
-    // All other existing functions like confirmGiveRobux, confirmTempBanUser, bulkAction, etc., remain the same here.
-    // Use placeholders to perform admin actions and log the corresponding output.
-    
-    function showConfirmation(message, onConfirm) {
-        document.getElementById("modalMessage").innerText = message;
-        document.getElementById("confirmButton").onclick = function() {
-            onConfirm();
-            closeModal();
-        };
-        document.getElementById("confirmationModal").style.display = "block";
+    function confirmGiveRobux() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const amount = document.getElementById("robuxAmount").value;
+        if (usernames.length && amount) {
+            showConfirmation(`Give ${amount} Robux to: ${usernames.join(", ")}?`, () => logAction(`Gave ${amount} Robux to users: ${usernames.join(", ")}`));
+        } else {
+            showNotification("Error: Missing usernames or amount.", true);
+        }
     }
 
-    function closeModal() {
-        document.getElementById("confirmationModal").style.display = "none";
+    function confirmTempBanUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const duration = document.getElementById("banDuration").value;
+        const reason = document.getElementById("reason").value;
+        if (usernames.length && duration && reason) {
+            showConfirmation(`Temp ban users: ${usernames.join(", ")} for ${duration} minutes with reason: ${reason}?`, () => logAction(`Temp banned users: ${usernames.join(", ")} | Duration: ${duration} minutes | Reason: ${reason}`));
+        } else {
+            showNotification("Error: Missing usernames, duration, or reason.", true);
+        }
+    }
+
+    function confirmPermaBanUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+        if (usernames.length && reason) {
+            showConfirmation(`Permanently ban users: ${usernames.join(", ")} with reason: ${reason}?`, () => logAction(`Permanently banned users: ${usernames.join(", ")} | Reason: ${reason}`));
+        } else {
+            showNotification("Error: Missing usernames or reason.", true);
+        }
+    }
+
+    function confirmIpBanUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+        if (usernames.length && reason) {
+            showConfirmation(`IP ban users: ${usernames.join(", ")} with reason: ${reason}?`, () => logAction(`IP banned users: ${usernames.join(", ")} | Reason: ${reason}`));
+        } else {
+            showNotification("Error: Missing usernames or reason.", true);
+        }
+    }
+
+    function confirmWarnUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+        if (usernames.length && reason) {
+            showConfirmation(`Warn users: ${usernames.join(", ")} with reason: ${reason}?`, () => logAction(`Warned users: ${usernames.join(", ")} | Reason: ${reason}`));
+        } else {
+            showNotification("Error: Missing usernames or reason.", true);
+        }
+    }
+
+    function bulkAction(type) {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+        const duration = document.getElementById("banDuration").value;
+        let action = "";
+        switch(type) {
+            case 'tempBan':
+                if (!duration) {
+                    showNotification("Error: Missing duration for temp ban.", true);
+                    return;
+                }
+                action = `Bulk temp ban users for ${duration} minutes`;
+                break;
+            case 'permaBan':
+                action = "Bulk permanently ban users";
+                break;
+            case 'ipBan':
+                action = "Bulk IP ban users";
+                break;
+            case 'warn':
+                action = "Bulk warn users";
+                break;
+        }
+        if (usernames.length && reason) {
+            showConfirmation(`${action}: ${usernames.join(", ")} with reason: ${reason}?`, () => logAction(`${action} | Users: ${usernames.join(", ")} | Reason: ${reason}`));
+        } else {
+            showNotification("Error: Missing usernames or reason.", true);
+        }
     }
 
     function showNotification(message, isError) {
         const notification = document.getElementById("notification");
-        notification.innerText = message;
+        notification.textContent = message;
         notification.className = `notification ${isError ? 'error' : 'success'}`;
         notification.style.display = "block";
+        setTimeout(() => notification.style.display = "none", 3000);
+    }
 
-        setTimeout(() => {
-            notification.style.display = "none";
-        }, 3000);
+    function showConfirmation(message, onConfirm) {
+        const modal = document.getElementById("confirmationModal");
+        const modalMessage = document.getElementById("modalMessage");
+        const confirmButton = document.getElementById("confirmButton");
+        modalMessage.textContent = message;
+        modal.style.display = "block";
+        confirmButton.onclick = function() {
+            onConfirm();
+            closeModal();
+        };
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("confirmationModal");
+        modal.style.display = "none";
     }
 
     function logAction(action) {
         const logOutput = document.getElementById("logOutput");
-        const logEntry = document.createElement("div");
-        logEntry.innerText = `${new Date().toLocaleString()}: ${action}`;
+        const logEntry = document.createElement("p");
+        logEntry.textContent = action;
         logOutput.appendChild(logEntry);
         saveLog();
     }
 
     function saveLog() {
-        const logOutput = document.getElementById("logOutput").innerHTML;
-        localStorage.setItem('adminLog', logOutput);
+        const logOutput = document.getElementById("logOutput");
+        localStorage.setItem("adminLog", logOutput.innerHTML);
     }
 
     function loadLog() {
-        const logOutput = localStorage.getItem('adminLog');
-        if (logOutput) {
-            document.getElementById("logOutput").innerHTML = logOutput;
+        const savedLog = localStorage.getItem("adminLog");
+        if (savedLog) {
+            document.getElementById("logOutput").innerHTML = savedLog;
         }
     }
 
-    // Other functions like customization handling, keyboard shortcuts, and reset functionality can be retained here.
+    function applyCustomizations() {
+        const panelColor = document.getElementById("panelColor").value;
+        const buttonColor = document.getElementById("buttonColor").value;
+        const fontSize = document.getElementById("fontSize").value + "px";
+        const borderRadius = document.getElementById("borderRadius").value + "px";
+        const fontFamily = document.getElementById("fontFamily").value;
+
+        document.querySelectorAll(".customization-panel").forEach(panel => {
+            panel.style.backgroundColor = panelColor;
+        });
+        document.querySelectorAll(".admin-button").forEach(button => {
+            button.style.backgroundColor = buttonColor;
+            button.style.fontSize = fontSize;
+            button.style.borderRadius = borderRadius;
+            button.style.fontFamily = fontFamily;
+        });
+
+        saveCustomizations();
+    }
+
+    function saveCustomizations() {
+        const customizations = {
+            panelColor: document.getElementById("panelColor").value,
+            buttonColor: document.getElementById("buttonColor").value,
+            fontSize: document.getElementById("fontSize").value,
+            borderRadius: document.getElementById("borderRadius").value,
+            fontFamily: document.getElementById("fontFamily").value
+        };
+        localStorage.setItem("customizations", JSON.stringify(customizations));
+    }
+
+    function loadCustomizations() {
+        const savedCustomizations = JSON.parse(localStorage.getItem("customizations"));
+        if (savedCustomizations) {
+            document.getElementById("panelColor").value = savedCustomizations.panelColor;
+            document.getElementById("buttonColor").value = savedCustomizations.buttonColor;
+            document.getElementById("fontSize").value = savedCustomizations.fontSize;
+            document.getElementById("borderRadius").value = savedCustomizations.borderRadius;
+            document.getElementById("fontFamily").value = savedCustomizations.fontFamily;
+            applyCustomizations();
+        }
+    }
+
+    function resetCustomizations() {
+        document.getElementById("panelColor").value = "#ffffff";
+        document.getElementById("buttonColor").value = "#007bff";
+        document.getElementById("fontSize").value = "16";
+        document.getElementById("borderRadius").value = "8";
+        document.getElementById("fontFamily").value = "Arial";
+        applyCustomizations();
+    }
 
 </script>
 
