@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Admin Panel (Enhanced)</title>
     <style>
+
         /* Base Styles */
         body {
             font-family: Arial, sans-serif;
@@ -17,7 +18,6 @@
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 20px;
         }
 
         .admin-panel {
@@ -95,7 +95,6 @@
             top: 10px;
             right: 10px;
             z-index: 999;
-            transition: opacity 0.5s;
         }
 
         .notification.error {
@@ -132,6 +131,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
+            background-color: rgb(0,0,0);
             background-color: rgba(0,0,0,0.4);
             padding-top: 60px;
         }
@@ -159,6 +159,42 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        /* User Details */
+        .user-details {
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Help Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the tooltip */
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +212,7 @@
 
         <div class="input-group">
             <label for="robuxAmount">Robux Amount:</label>
-            <input type="number" id="robuxAmount" placeholder="Enter Robux amount" min="1" step="1">
+            <input type="number" id="robuxAmount" placeholder="Enter Robux amount">
         </div>
 
         <div class="input-group">
@@ -216,6 +252,9 @@
             Warn User
             <span class="tooltiptext">Issue a warning to the user</span>
         </button>
+
+        <h3>User Details</h3>
+        <div id="userDetails" class="user-details"></div>
     </div>
 
     <div class="section">
@@ -229,17 +268,17 @@
     <h2>Customize Admin Panel</h2>
     <div class="settings-group">
         <label for="panelColor">Panel Background Color:</label>
-        <input type="color" id="panelColor" class="input-color" value="#ffffff">
+        <input type="color" id="panelColor" class="input-color">
     </div>
 
     <div class="settings-group">
         <label for="buttonColor">Button Background Color:</label>
-        <input type="color" id="buttonColor" class="input-color" value="#007bff">
+        <input type="color" id="buttonColor" class="input-color">
     </div>
 
     <div class="settings-group">
         <label for="fontSize">Button Font Size:</label>
-        <input type="number" id="fontSize" placeholder="Font size (px)" value="16">
+        <input type="number" id="fontSize" placeholder="Font size (px)">
     </div>
 
     <button class="admin-button" onclick="applyCustomizations()">Apply Customizations</button>
@@ -267,77 +306,140 @@
     };
 
     function confirmGiveRobux() {
-        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const username = document.getElementById("username").value;
         const robuxAmount = document.getElementById("robuxAmount").value;
 
-        if (usernames.length && robuxAmount) {
-            showConfirmation(`Give ${robuxAmount} Robux to ${usernames.join(", ")}?`, () => giveRobux(usernames, robuxAmount));
+        if (username && robuxAmount) {
+            showConfirmation(Give ${robuxAmount} Robux to ${username}?, () => giveRobux());
         } else {
-            showNotification("Error: Missing usernames or Robux amount.", true);
+            showNotification("Error: Missing username or Robux amount.", true);
         }
     }
 
     function confirmTempBanUser() {
-        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
-        const duration = document.getElementById("banDuration").value;
+        const username = document.getElementById("username").value;
+        const banDuration = document.getElementById("banDuration").value;
         const reason = document.getElementById("reason").value;
 
-        if (usernames.length && duration && reason) {
-            showConfirmation(`Temporarily ban ${usernames.join(", ")} for ${duration}?`, () => tempBanUser(usernames, duration, reason));
+        if (username && reason) {
+            showConfirmation(Temporarily ban ${username} for ${banDuration}?, () => tempBanUser());
         } else {
-            showNotification("Error: Missing username(s), duration, or reason.", true);
+            showNotification("Error: Missing username or reason.", true);
         }
     }
 
     function confirmPermaBanUser() {
-        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const username = document.getElementById("username").value;
         const reason = document.getElementById("reason").value;
 
-        if (usernames.length && reason) {
-            showConfirmation(`Permanently ban ${usernames.join(", ")}?`, () => permaBanUser(usernames, reason));
+        if (username && reason) {
+            showConfirmation(Permanently ban ${username}?, () => permaBanUser());
         } else {
-            showNotification("Error: Missing username(s) or reason.", true);
+            showNotification("Error: Missing username or reason.", true);
         }
     }
 
     function confirmIpBanUser() {
-        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
-
-        if (usernames.length) {
-            showConfirmation(`Ban IP address of ${usernames.join(", ")}?`, () => ipBanUser(usernames));
+        const username = document.getElementById("username").value;
+        if (username) {
+            showConfirmation(Apply IP ban to ${username}?, () => ipBanUser());
         } else {
-            showNotification("Error: Missing username(s).", true);
+            showNotification("Error: Username is missing.", true);
         }
     }
 
     function confirmWarnUser() {
-        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const username = document.getElementById("username").value;
         const reason = document.getElementById("reason").value;
 
-        if (usernames.length && reason) {
-            showConfirmation(`Warn ${usernames.join(", ")} for: ${reason}?`, () => warnUser(usernames, reason));
+        if (username && reason) {
+            showConfirmation(Warn ${username}?, () => warnUser());
         } else {
-            showNotification("Error: Missing username(s) or reason.", true);
+            showNotification("Error: Missing username or reason.", true);
         }
     }
 
-    function showConfirmation(message, confirmAction) {
-        document.getElementById("modalMessage").innerText = message;
+    function showConfirmation(message, onConfirm) {
+        document.getElementById("modalMessage").textContent = message;
+        document.getElementById("confirmButton").onclick = onConfirm;
         document.getElementById("confirmationModal").style.display = "block";
-        document.getElementById("confirmButton").onclick = function() {
-            confirmAction();
-            closeModal();
-        };
     }
 
     function closeModal() {
         document.getElementById("confirmationModal").style.display = "none";
     }
 
+    function giveRobux() {
+        const username = document.getElementById("username").value;
+        const robuxAmount = document.getElementById("robuxAmount").value;
+        logAction(Gave ${robuxAmount} Robux to user ${username}.);
+        showNotification(Successfully gave ${robuxAmount} Robux to ${username}.);
+        resetInputs();
+    }
+
+    function tempBanUser() {
+        const username = document.getElementById("username").value;
+        const banDuration = document.getElementById("banDuration").value;
+        const reason = document.getElementById("reason").value;
+        logAction(User ${username} has been temporarily banned for ${banDuration}. Reason: ${reason}.);
+        showNotification(User ${username} has been temporarily banned for ${banDuration}.);
+        resetInputs();
+    }
+
+    function permaBanUser() {
+        const username = document.getElementById("username").value;
+        const reason = document.getElementById("reason").value;
+        logAction(User ${username} has been permanently banned. Reason: ${reason}.);
+        showNotification(User ${username} has been permanently banned.);
+        resetInputs();
+    }
+
+    function ipBanUser() {
+        const username = document.getElementById("username").value;
+        logAction(IP ban applied to user ${username}.);
+        showNotification(IP ban applied to user ${username}.);
+        resetInputs();
+    }
+
+    function warnUser() {
+        const username = document.getElementById("username").value;
+        const reason = document.getElementById("reason").value;
+        logAction(User ${username} has been warned. Reason: ${reason}.);
+        showNotification(User ${username} has been warned.);
+        resetInputs();
+    }
+
+    function logAction(action) {
+        const logOutput = document.getElementById("logOutput");
+        const timestamp = new Date().toLocaleString();
+        logOutput.textContent += [${timestamp}] ${action}\n;
+        saveLog(logOutput.textContent);
+    }
+
+    function loadLog() {
+        const savedLog = localStorage.getItem("adminLog");
+        if (savedLog) {
+            document.getElementById("logOutput").textContent = savedLog;
+        }
+    }
+
+    function saveLog(logContent) {
+        localStorage.setItem("adminLog", logContent);
+    }
+
+    function resetInputs() {
+        document.getElementById("username").value = '';
+        document.getElementById("robuxAmount").value = '';
+        document.getElementById("reason").value = '';
+        document.getElementById("banDuration").value = '1 day';
+        document.getElementById("userDetails").textContent = '';
+    }
+
+    // Notification System
     function showNotification(message, isError = false) {
         const notification = document.getElementById("notification");
-        notification.innerText = message;
-        notification.className = `notification ${isError ? 'error' : ''}`;
+        notification.textContent = message;
+        notification.classList.toggle("error", isError);
         notification.style.display = "block";
 
         setTimeout(() => {
@@ -345,83 +447,68 @@
         }, 3000);
     }
 
-    function giveRobux(usernames, robuxAmount) {
-        const logMessage = `Gave ${robuxAmount} Robux to ${usernames.join(", ")}.`;
-        logAction(logMessage);
-        showNotification(logMessage);
-    }
-
-    function tempBanUser(usernames, duration, reason) {
-        const logMessage = `Temporarily banned ${usernames.join(", ")} for ${duration}. Reason: ${reason}.`;
-        logAction(logMessage);
-        showNotification(logMessage);
-    }
-
-    function permaBanUser(usernames, reason) {
-        const logMessage = `Permanently banned ${usernames.join(", ")}. Reason: ${reason}.`;
-        logAction(logMessage);
-        showNotification(logMessage);
-    }
-
-    function ipBanUser(usernames) {
-        const logMessage = `IP banned ${usernames.join(", ")}.`;
-        logAction(logMessage);
-        showNotification(logMessage);
-    }
-
-    function warnUser(usernames, reason) {
-        const logMessage = `Warned ${usernames.join(", ")}. Reason: ${reason}.`;
-        logAction(logMessage);
-        showNotification(logMessage);
-    }
-
-    function logAction(message) {
-        const logOutput = document.getElementById("logOutput");
-        logOutput.innerText += `${new Date().toLocaleString()}: ${message}\n`;
-        saveLog();
-    }
-
-    function loadLog() {
-        const log = localStorage.getItem('adminLog');
-        if (log) {
-            document.getElementById("logOutput").innerText = log;
-        }
-    }
-
-    function saveLog() {
-        const log = document.getElementById("logOutput").innerText;
-        localStorage.setItem('adminLog', log);
-    }
-
-    function loadCustomizations() {
-        document.getElementById("panelColor").value = localStorage.getItem('panelColor') || '#ffffff';
-        document.getElementById("buttonColor").value = localStorage.getItem('buttonColor') || '#007bff';
-        document.getElementById("fontSize").value = localStorage.getItem('fontSize') || 16;
-    }
-
+    // Customization Features
     function applyCustomizations() {
         const panelColor = document.getElementById("panelColor").value;
         const buttonColor = document.getElementById("buttonColor").value;
         const fontSize = document.getElementById("fontSize").value;
 
-        document.documentElement.style.setProperty('--panel-bg-color', panelColor);
-        document.documentElement.style.setProperty('--button-bg-color', buttonColor);
-        document.documentElement.style.setProperty('--button-font-size', `${fontSize}px`);
+        if (panelColor) {
+            document.body.style.setProperty('--panel-bg-color', panelColor);
+        }
+        if (buttonColor) {
+            document.body.style.setProperty('--button-bg-color', buttonColor);
+        }
+        if (fontSize) {
+            document.body.style.setProperty('--button-font-size', fontSize + 'px');
+        }
 
-        localStorage.setItem('panelColor', panelColor);
-        localStorage.setItem('buttonColor', buttonColor);
-        localStorage.setItem('fontSize', fontSize);
-
-        showNotification("Customizations applied!");
+        saveCustomizations();
+        showNotification("Customizations applied successfully!");
     }
 
     function resetCustomizations() {
-        localStorage.removeItem('panelColor');
-        localStorage.removeItem('buttonColor');
-        localStorage.removeItem('fontSize');
+        document.body.style.setProperty('--panel-bg-color', '#ffffff');
+        document.body.style.setProperty('--button-bg-color', '#007bff');
+        document.body.style.setProperty('--button-font-size', '16px');
 
-        loadCustomizations();
+        resetCustomizationInputs();
         showNotification("Customizations reset to default.");
+    }
+
+    function saveCustomizations() {
+        const panelColor = document.getElementById("panelColor").value;
+        const buttonColor = document.getElementById("buttonColor").value;
+        const fontSize = document.getElementById("fontSize").value;
+
+        localStorage.setItem("panelColor", panelColor);
+        localStorage.setItem("buttonColor", buttonColor);
+        localStorage.setItem("fontSize", fontSize);
+    }
+
+    function loadCustomizations() {
+        const panelColor = localStorage.getItem("panelColor");
+        const buttonColor = localStorage.getItem("buttonColor");
+        const fontSize = localStorage.getItem("fontSize");
+
+        if (panelColor) {
+            document.body.style.setProperty('--panel-bg-color', panelColor);
+            document.getElementById("panelColor").value = panelColor;
+        }
+        if (buttonColor) {
+            document.body.style.setProperty('--button-bg-color', buttonColor);
+            document.getElementById("buttonColor").value = buttonColor;
+        }
+        if (fontSize) {
+            document.body.style.setProperty('--button-font-size', fontSize + 'px');
+            document.getElementById("fontSize").value = fontSize;
+        }
+    }
+
+    function resetCustomizationInputs() {
+        document.getElementById("panelColor").value = '#ffffff';
+        document.getElementById("buttonColor").value = '#007bff';
+        document.getElementById("fontSize").value = '';
     }
 </script>
 
