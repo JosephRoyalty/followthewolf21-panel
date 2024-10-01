@@ -3,226 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Admin Panel - Report System</title>
+    <title>Admin Panel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
         }
-
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            background-color: #fff;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
         }
-
         h1 {
             text-align: center;
             color: #333;
         }
-
-        .report-box, .customization-panel {
-            background-color: #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            font-family: monospace;
+        .form-group {
+            margin-bottom: 15px;
         }
-
-        .report-actions, .admin-actions {
-            text-align: center;
-            margin-bottom: 30px;
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
         }
-
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
         .admin-button {
-            margin: 5px;
-            padding: 12px 20px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
+            padding: 10px 15px;
             cursor: pointer;
-            font-size: 16px;
+            transition: background-color 0.3s;
         }
-
         .admin-button:hover {
             background-color: #0056b3;
         }
-
-        #falseReportButton {
-            background-color: #dc3545;
-        }
-
-        #falseReportButton:hover {
-            background-color: #c82333;
-        }
-
-        #notification {
-            text-align: center;
+        .log-output {
+            background: #fff;
+            border: 1px solid #ddd;
             padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .notification {
             display: none;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 4px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .customization-panel {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            border: 1px solid #dddddd;
+        }
+        .customization-panel input {
+            width: 100px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Roblox Admin Panel - Report System</h1>
-
-    <div id="reportContainer" class="report-box">
-        <!-- Report will be loaded here -->
+    <h1>Admin Panel</h1>
+    <div class="form-group">
+        <label for="username">Usernames (comma-separated):</label>
+        <input type="text" id="username" placeholder="Enter usernames">
     </div>
-
-    <div class="report-actions">
-        <button class="admin-button" onclick="tempBan()">Temporary Ban</button>
-        <button class="admin-button" onclick="permaBan()">Permanent Ban</button>
-        <button class="admin-button" onclick="ipBan()">IP Ban</button>
-        <button class="admin-button" onclick="warnUser()">Warn User</button>
-        <button class="admin-button" id="falseReportButton" onclick="falseReport()">False Report</button>
+    <div class="form-group">
+        <label for="robuxAmount">Robux Amount:</label>
+        <input type="number" id="robuxAmount" placeholder="Enter amount">
     </div>
-
-    <div class="admin-actions">
-        <h3>Admin Log</h3>
-        <div id="logOutput"></div>
-        <button class="admin-button" onclick="clearLog()">Clear Log</button>
+    <div class="form-group">
+        <label for="banDuration">Ban Duration (minutes):</label>
+        <input type="number" id="banDuration" placeholder="Enter duration">
     </div>
+    <div class="form-group">
+        <label for="reason">Reason:</label>
+        <input type="text" id="reason" placeholder="Enter reason">
+    </div>
+    <button class="admin-button" onclick="confirmGiveRobux()">Give Robux</button>
+    <button class="admin-button" onclick="confirmTempBanUser()">Temp Ban User</button>
+    <button class="admin-button" onclick="confirmPermaBanUser()">Perma Ban User</button>
+    <button class="admin-button" onclick="confirmIpBanUser()">IP Ban User</button>
+    <button class="admin-button" onclick="confirmWarnUser()">Warn User</button>
+    <button class="admin-button" onclick="bulkAction('tempBan')">Bulk Temp Ban</button>
+    <button class="admin-button" onclick="bulkAction('permaBan')">Bulk Perma Ban</button>
+    <button class="admin-button" onclick="bulkAction('ipBan')">Bulk IP Ban</button>
+    <button class="admin-button" onclick="bulkAction('warn')">Bulk Warn</button>
 
-    <div id="notification"></div>
+    <!-- Log Output -->
+    <div class="log-output" id="logOutput"></div>
 
+    <!-- Customization Panel -->
     <div class="customization-panel">
-        <h3>Panel Customization</h3>
-        <label>Panel Background Color: <input type="color" id="panelColor" value="#ffffff"></label>
-        <br><br>
-        <label>Button Background Color: <input type="color" id="buttonColor" value="#007bff"></label>
-        <br><br>
-        <label>Font Size (px): <input type="number" id="fontSize" value="16"></label>
-        <br><br>
-        <label>Button Border Radius (px): <input type="number" id="borderRadius" value="8"></label>
-        <br><br>
-        <label>Font Family: <select id="fontFamily">
-            <option value="Arial">Arial</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Tahoma">Tahoma</option>
-        </select></label>
-        <br><br>
+        <h2>Customization</h2>
+        <div class="form-group">
+            <label for="panelColor">Panel Color:</label>
+            <input type="color" id="panelColor" value="#ffffff">
+        </div>
+        <div class="form-group">
+            <label for="buttonColor">Button Color:</label>
+            <input type="color" id="buttonColor" value="#007bff">
+        </div>
+        <div class="form-group">
+            <label for="fontSize">Font Size (px):</label>
+            <input type="number" id="fontSize" value="16">
+        </div>
+        <div class="form-group">
+            <label for="borderRadius">Button Border Radius (px):</label>
+            <input type="number" id="borderRadius" value="8">
+        </div>
+        <div class="form-group">
+            <label for="fontFamily">Font Family:</label>
+            <input type="text" id="fontFamily" value="Arial">
+        </div>
         <button class="admin-button" onclick="applyCustomizations()">Apply Customizations</button>
         <button class="admin-button" onclick="resetCustomizations()">Reset Customizations</button>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modalMessage"></p>
+            <button class="admin-button" id="confirmButton">Confirm</button>
+        </div>
     </div>
 </div>
 
 <script>
-    const reports = generateReports(200); // Generate 200 reports
+    window.onload = function() {
+        loadLog();
+        loadCustomizations();
+    };
 
-    // Generate 200 reports with appropriate messages matching their reason
-    function generateReports(count) {
-        const categorizedMessages = {
-            "Harassment": ["You are so dumb!", "No one likes you!", "Your game is trash."],
-            "Scamming": ["Can you give me free Robux?", "Buy my fake items!"],
-            "Phishing": ["Click this link to get free Robux!", "Join my site to get exclusive items!"],
-            "Toxic Behavior": ["You are the worst player ever!", "You're a failure at this game."],
-            "False Reporting": ["I'm reporting you for fun.", "I'm making a fake report because I don't like you."],
-            "Cheating": ["I use hacks to win.", "I always use cheats."],
-            "Inappropriate Language": ["F*** you!", "This game is s***!"]
+    function confirmGiveRobux() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const robuxAmount = document.getElementById("robuxAmount").value;
+
+        if (usernames.length && robuxAmount) {
+            showConfirmation(`Give ${robuxAmount} Robux to ${usernames.join(", ")}?`, () => giveRobux(usernames, robuxAmount));
+        } else {
+            showNotification("Error: Missing usernames or Robux amount.", true);
+        }
+    }
+
+    function confirmTempBanUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const duration = document.getElementById("banDuration").value;
+        const reason = document.getElementById("reason").value;
+
+        if (usernames.length && duration && reason) {
+            showConfirmation(`Temporarily ban ${usernames.join(", ")} for ${duration} minutes?`, () => tempBanUser(usernames, duration, reason));
+        } else {
+            showNotification("Error: Missing username(s), duration, or reason.", true);
+        }
+    }
+
+    function confirmPermaBanUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+
+        if (usernames.length && reason) {
+            showConfirmation(`Permanently ban ${usernames.join(", ")}?`, () => permaBanUser(usernames, reason));
+        } else {
+            showNotification("Error: Missing username(s) or reason.", true);
+        }
+    }
+
+    function confirmIpBanUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+
+        if (usernames.length) {
+            showConfirmation(`Ban IP address of ${usernames.join(", ")}?`, () => ipBanUser(usernames));
+        } else {
+            showNotification("Error: Missing username(s).", true);
+        }
+    }
+
+    function confirmWarnUser() {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+
+        if (usernames.length && reason) {
+            showConfirmation(`Warn ${usernames.join(", ")} for reason: ${reason}?`, () => warnUser(usernames, reason));
+        } else {
+            showNotification("Error: Missing username(s) or reason.", true);
+        }
+    }
+
+    function bulkAction(actionType) {
+        const usernames = document.getElementById("username").value.split(",").map(user => user.trim());
+        const reason = document.getElementById("reason").value;
+
+        if (usernames.length) {
+            let actionMessage;
+            switch (actionType) {
+                case 'tempBan':
+                    actionMessage = `Temporarily ban ${usernames.join(", ")}?`;
+                    showConfirmation(actionMessage, () => bulkTempBan(usernames));
+                    break;
+                case 'permaBan':
+                    actionMessage = `Permanently ban ${usernames.join(", ")}?`;
+                    showConfirmation(actionMessage, () => bulkPermaBan(usernames));
+                    break;
+                case 'ipBan':
+                    actionMessage = `IP ban ${usernames.join(", ")}?`;
+                    showConfirmation(actionMessage, () => bulkIpBan(usernames));
+                    break;
+                case 'warn':
+                    if (reason) {
+                        actionMessage = `Warn ${usernames.join(", ")} for reason: ${reason}?`;
+                        showConfirmation(actionMessage, () => bulkWarn(usernames, reason));
+                    } else {
+                        showNotification("Error: Reason is required for warnings.", true);
+                    }
+                    break;
+                default:
+                    showNotification("Error: Unknown action.", true);
+            }
+        } else {
+            showNotification("Error: Missing username(s).", true);
+        }
+    }
+
+    function showConfirmation(message, onConfirm) {
+        document.getElementById("modalMessage").innerText = message;
+        document.getElementById("confirmButton").onclick = function() {
+            onConfirm();
+            closeModal();
         };
-
-        const reports = [];
-        for (let i = 0; i < count; i++) {
-            const timestamp = generateRandomDate();
-            const reason = getRandomReason(categorizedMessages);
-            const message = getRandomMessage(categorizedMessages[reason]);
-            const isValid = Math.random() > 0.4; // 60% chance the report is valid, 40% chance it's false
-            reports.push({ timestamp, message, reason, isValid });
-        }
-        return reports;
+        document.getElementById("confirmationModal").style.display = "block";
     }
 
-    // Generate a random date between 08/29/24 and 10/01/24
-    function generateRandomDate() {
-        const start = new Date(2024, 7, 29).getTime(); // August 29, 2024
-        const end = new Date(2024, 9, 1).getTime();    // October 01, 2024
-        const randomDate = new Date(start + Math.random() * (end - start));
-        return randomDate.toLocaleDateString();
+    function closeModal() {
+        document.getElementById("confirmationModal").style.display = "none";
     }
 
-    // Get a random reason from the categorizedMessages object
-    function getRandomReason(categorizedMessages) {
-        const reasons = Object.keys(categorizedMessages);
-        return reasons[Math.floor(Math.random() * reasons.length)];
-    }
-
-    // Get a random message from the selected category
-    function getRandomMessage(messages) {
-        return messages[Math.floor(Math.random() * messages.length)];
-    }
-
-    let currentReportIndex = 0;
-
-    // Load the first report
-    function loadReport() {
-        const report = reports[currentReportIndex];
-        document.getElementById("reportContainer").innerHTML = `
-            <p><strong>Message sent at:</strong> ${report.timestamp}</p>
-            <p><strong>Message:</strong> ${report.message}</p>
-            <p><strong>Reason reported:</strong> ${report.reason}</p>
-            <p>Click "False Report" if this report is not valid.</p>
-        `;
-    }
-
-    // Show notification
-    function showNotification(message, isError = false) {
+    function showNotification(message, isError) {
         const notification = document.getElementById("notification");
-        notification.textContent = message;
+        notification.innerText = message;
+        notification.className = `notification ${isError ? 'error' : 'success'}`;
         notification.style.display = "block";
-        notification.style.backgroundColor = isError ? "#dc3545" : "#28a745";
-        setTimeout(() => notification.style.display = "none", 3000);
+
+        setTimeout(() => {
+            notification.style.display = "none";
+        }, 3000);
     }
 
-    // Handle the actions
-    function tempBan() {
-        logAction(`User temporarily banned. Reason: ${reports[currentReportIndex].reason}`);
-        showNotification(`User temporarily banned. Reason: ${reports[currentReportIndex].reason}`);
-        nextReport();
+    function giveRobux(usernames, amount) {
+        // Placeholder for actual logic to give Robux
+        logAction(`Gave ${amount} Robux to ${usernames.join(", ")}`);
     }
 
-    function permaBan() {
-        logAction(`User permanently banned. Reason: ${reports[currentReportIndex].reason}`);
-        showNotification(`User permanently banned. Reason: ${reports[currentReportIndex].reason}`);
-        nextReport();
+    function tempBanUser(usernames, duration, reason) {
+        // Placeholder for actual logic to temp ban users
+        logAction(`Temporarily banned ${usernames.join(", ")} for ${duration} minutes (Reason: ${reason})`);
     }
 
-    function ipBan() {
-        logAction(`IP ban applied. Reason: ${reports[currentReportIndex].reason}`);
-        showNotification(`IP ban applied. Reason: ${reports[currentReportIndex].reason}`);
-        nextReport();
+    function permaBanUser(usernames, reason) {
+        // Placeholder for actual logic to perma ban users
+        logAction(`Permanently banned ${usernames.join(", ")} (Reason: ${reason})`);
     }
 
-    function warnUser() {
-        logAction(`User warned. Reason: ${reports[currentReportIndex].reason}`);
-        showNotification(`User warned. Reason: ${reports[currentReportIndex].reason}`);
-        nextReport();
+    function ipBanUser(usernames) {
+        // Placeholder for actual logic to IP ban users
+        logAction(`IP banned ${usernames.join(", ")}`);
     }
 
-    function falseReport() {
-        if (reports[currentReportIndex].isValid) {
-            showNotification("This is not a false report. Action should be taken.", true);
-        } else {
-            logAction(`Report marked as false. No action taken.`);
-            showNotification("This report was marked as a false report.");
+    function warnUser(usernames, reason) {
+        // Placeholder for actual logic to warn users
+        logAction(`Warned ${usernames.join(", ")} (Reason: ${reason})`);
+    }
+
+    function bulkTempBan(usernames) {
+        // Placeholder for bulk temp ban logic
+        logAction(`Bulk temporarily banned ${usernames.join(", ")}`);
+    }
+
+    function bulkPermaBan(usernames) {
+        // Placeholder for bulk perma ban logic
+        logAction(`Bulk permanently banned ${usernames.join(", ")}`);
+    }
+
+    function bulkIpBan(usernames) {
+        // Placeholder for bulk IP ban logic
+        logAction(`Bulk IP banned ${usernames.join(", ")}`);
+    }
+
+    function bulkWarn(usernames, reason) {
+        // Placeholder for bulk warn logic
+        logAction(`Bulk warned ${usernames.join(", ")} (Reason: ${reason})`);
+    }
+
+    function logAction(action) {
+        const logOutput = document.getElementById("logOutput");
+        const logEntry = document.createElement("div");
+        logEntry.innerText = `${new Date().toLocaleString()}: ${action}`;
+        logOutput.appendChild(logEntry);
+        saveLog();
+    }
+
+    function saveLog() {
+        const logOutput = document.getElementById("logOutput").innerHTML;
+        localStorage.setItem('adminLog', logOutput);
+    }
+
+    function loadLog() {
+        const logOutput = localStorage.getItem('adminLog');
+        if (logOutput) {
+            document.getElementById("logOutput").innerHTML = logOutput;
         }
-        nextReport();
     }
 
-    // Move to the next report
-    function nextReport() {
-        currentReportIndex++;
-        if (currentReportIndex < reports.length) {
-            loadReport();
-        } else {
-            document.getElementById("reportContainer").innerHTML = "<p>All reports have been processed.</p>";
+    function applyCustomizations() {
+        const panelColor = document.getElementById("panelColor").value;
+        const buttonColor = document.getElementById("buttonColor").value;
+        const fontSize = document.getElementById("fontSize").value;
+        const borderRadius = document.getElementById("borderRadius").value;
+        const fontFamily = document.getElementById("fontFamily").value;
+
+        document.body.style.backgroundColor = panelColor;
+        const buttons = document.querySelectorAll('.admin-button');
+        buttons.forEach(button => {
+            button.style.backgroundColor = buttonColor;
+            button.style.borderRadius = `${borderRadius}px`;
+        });
+        document.body.style.fontSize = `${fontSize}px`;
+        document.body.style.fontFamily = fontFamily;
+
+        saveCustomizations(panelColor, buttonColor, fontSize, borderRadius, fontFamily);
+        showNotification("Customizations applied successfully!", false);
+    }
+
+    function resetCustomizations() {
+        document.body.style.backgroundColor = "#f4f4f4";
+        const buttons = document.querySelectorAll('.admin-button');
+        buttons.forEach(button => {
+            button.style.backgroundColor = "#007bff";
+            button.style.borderRadius = "4px";
+        });
+        document.body.style.fontSize = "16px";
+        document.body.style.fontFamily = "Arial";
+
+        localStorage.removeItem('adminCustomizations');
+        showNotification("Customizations reset to default!", false);
+    }
+
+    function saveCustomizations(panelColor, buttonColor, fontSize, borderRadius, fontFamily) {
+        const customizations = {
+            panelColor,
+            buttonColor,
+            fontSize,
+            borderRadius,
+            fontFamily
+        };
+        localStorage.setItem('adminCustomizations', JSON.stringify(customizations));
+    }
+
+    function loadCustomizations() {
+        const customizations = JSON.parse(localStorage.getItem('adminCustomizations'));
+        if (customizations) {
+            document.body.style.backgroundColor = customizations.panelColor;
+            const buttons = document.querySelectorAll('.admin-button');
+            buttons.forEach(button => {
+                button.style.backgroundColor = customizations.buttonColor;
+                button.style.borderRadius = `${customizations.borderRadius}px`;
+            });
+            document.body.style.fontSize = `${customizations.fontSize}px`;
+            document.body.style.fontFamily = customizations.fontFamily;
         }
-   
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener("keydown", (event) => {
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault();
+            // Simulate save action
+            saveLog();
+            showNotification("Log saved!", false);
+        }
+    });
+
+    // Handle Enter key for specific inputs
+    document.getElementById("username").addEventListener("keypress", (event) => handleEnter(event, 'bulkAction'));
+    document.getElementById("reason").addEventListener("keypress", (event) => handleEnter(event, 'bulkAction'));
+
+    function handleEnter(event, action) {
+        if (event.key === 'Enter') {
+            switch (action) {
+                case 'bulkAction':
+                    bulkAction('tempBan'); // Replace with appropriate action based on context
+                    break;
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
